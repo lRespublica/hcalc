@@ -1,7 +1,8 @@
 module HCalc.Useful.Strings where
 
-checkBrackets :: [Char] -> Either String Bool
-checkBrackets = helper 0 0
+checkBracketsStr :: Maybe [Char] -> Either String Bool
+checkBracketsStr Nothing    = Left "Parser error"
+checkBracketsStr (Just str) = helper 0 0 str
     where
     helper lCount rCount str = case str of
                                         [] -> correctFinal
