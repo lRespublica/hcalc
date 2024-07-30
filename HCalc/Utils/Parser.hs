@@ -1,4 +1,4 @@
-module HCalc.Parser where
+module HCalc.Utils.Parser where
 import Control.Applicative (Alternative(..))
 
 newtype Parser tok a = Parser { runParser :: [tok] -> Maybe ([tok],a) }

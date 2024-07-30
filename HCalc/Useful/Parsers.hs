@@ -1,6 +1,6 @@
 module HCalc.Useful.Parsers where
 
-import HCalc.Parser
+import HCalc.Utils.Parser
 import HCalc.Useful.Char
 import Data.Char
 import Control.Applicative
