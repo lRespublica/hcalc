@@ -6,6 +6,9 @@ availableMathSymbols = "+-*/"
 
 operations = Map.fromList [('+', 5), ('-', 5), ('*', 4), ('*', 4)]
 
+functionsList = [("abs", 2), ("sqrt", 3)]
+availableFunctions = Map.fromList functionsList
+
 isAvailableMathSymbol :: Char -> Bool
 isAvailableMathSymbol c = c `elem` availableMathSymbols
 
