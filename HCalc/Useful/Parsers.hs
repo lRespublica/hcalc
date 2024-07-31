@@ -25,7 +25,7 @@ num = some digit
 allBrackets = (:) <$> bracket <*> allBrackets <|> anySymb *> allBrackets <|> pure []
 
 allFunctions = [ string (fst x) | x <- functionsList]
-allOperators = [ string [fst x] | x <- operatorsList]
+allOperators = [ string (fst x) | x <- operatorsList]
 
 runParsersList parsers val = fromMaybe Nothing findFunc
     where
