@@ -35,7 +35,12 @@ runParsersList parsers val = fromMaybe Nothing findFunc
 simpleParsers = [(NUM, num), (L_BRACKET, lBracket), (R_BRACKET, rBracket)]
 complexParsers = [(OPERATOR, allOperators), (FUNCTION, allFunctions)]
 
+runSimpleParsers :: [(TokenTypes, [Char] -> Maybe ([Char], [Char]))]
 runSimpleParsers = fmap runParser <$> simpleParsers
 runComplexParsers = fmap runParsersList <$> complexParsers
-
 runAllParsers = runSimpleParsers ++ runComplexParsers
+
+parseToken str = fromMaybe Nothing findToken
+    where
+    parsersResult = sequenceA <$> (sequenceA <$> runAllParsers <*> pure str)
+    findToken = find (/= Nothing) parsersResult

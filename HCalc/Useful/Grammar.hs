@@ -3,7 +3,13 @@ import Data.Char
 import qualified Data.Map as Map
 
 data TokenTypes = NUM | OPERATOR | FUNCTION | L_BRACKET | R_BRACKET
-                deriving Show
+                deriving (Show, Eq)
+
+instance Semigroup TokenTypes where
+    (<>) x y = NUM
+
+instance Monoid TokenTypes where
+    mempty = NUM
 
 operatorsList = [('+', 5), ('-', 5), ('*', 4), ('*', 4)]
 operators = Map.fromList operatorsList
