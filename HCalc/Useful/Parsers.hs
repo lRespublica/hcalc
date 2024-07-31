@@ -19,6 +19,7 @@ operator = satisfy isAvailableOperator
 bracket = satisfy isBracket
 lBracket = string "("
 rBracket = string ")"
+comma = string ","
 
 num = some digit
 
@@ -32,7 +33,7 @@ runParsersList parsers val = fromMaybe Nothing findFunc
     parsersResult = runParser <$> parsers <*> pure val
     findFunc = find (/= Nothing) parsersResult
 
-simpleParsers = [(NUM, num), (L_BRACKET, lBracket), (R_BRACKET, rBracket)]
+simpleParsers = [(NUM, num), (L_BRACKET, lBracket), (R_BRACKET, rBracket), (COMMA, comma)]
 complexParsers = [(OPERATOR, allOperators), (FUNCTION, allFunctions)]
 
 runSimpleParsers :: [(TokenTypes, [Char] -> Maybe ([Char], [Char]))]

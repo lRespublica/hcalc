@@ -2,8 +2,9 @@ module HCalc.Useful.Grammar where
 import Data.Char
 import qualified Data.Map as Map
 import Data.Maybe (fromJust)
+import HCalc.Utils.List
 
-data TokenTypes = NUM | OPERATOR | FUNCTION | L_BRACKET | R_BRACKET
+data TokenTypes = NUM | OPERATOR | FUNCTION | L_BRACKET | R_BRACKET | COMMA
                 deriving (Show, Eq)
 
 instance Semigroup TokenTypes where
