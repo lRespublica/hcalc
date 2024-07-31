@@ -1,6 +1,9 @@
-module HCalc.Useful.Strings where
+module HCalc.Useful.Checks where
 
-import HCalc.Useful.Char
+import HCalc.Useful.Grammar
+
+clearFromSpaces :: String -> String
+clearFromSpaces = filter (/=' ')
 
 checkBracketsStr :: Maybe [Char] -> Either String Bool
 checkBracketsStr Nothing    = Left "Parser error"

@@ -1,7 +1,10 @@
-module HCalc.Useful.Char where
+module HCalc.Useful.Grammar where
 import Data.Char
+import qualified Data.Map as Map
 
 availableMathSymbols = "+-*/"
+
+operations = Map.fromList [('+', 5), ('-', 5), ('*', 4), ('*', 4)]
 
 isAvailableMathSymbol :: Char -> Bool
 isAvailableMathSymbol c = c `elem` availableMathSymbols

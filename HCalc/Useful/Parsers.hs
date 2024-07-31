@@ -1,7 +1,7 @@
 module HCalc.Useful.Parsers where
 
 import HCalc.Utils.Parser
-import HCalc.Useful.Char
+import HCalc.Useful.Grammar
 import Data.Char
 import Control.Applicative
 
@@ -10,6 +10,8 @@ digit = satisfy isDigit
 space = satisfy isSpace
 symbol = satisfy isAvailableMathSymbol
 bracket = satisfy isBracket
+lBracket = satisfy (=='(')
+rBracket = satisfy (==')')
 
 num = some digit
 
