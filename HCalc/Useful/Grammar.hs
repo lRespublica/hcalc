@@ -31,9 +31,9 @@ compareOperators op1 op2 = case getPriorities of
     where
     getPriorities = fmap fst <$> sequenceA (Map.lookup <$> [op1, op2] <*> pure availableOperators)
 
-useOperator :: String -> Double -> Double -> Maybe Double
+useOperator :: String -> Maybe Double -> Maybe Double -> Maybe Double
 useOperator op varX varY | isNothing operation  = Nothing
-                         | otherwise = operation <*> pure varX <*> pure varY
+                         | otherwise = operation <*> varX <*> varY
     where
     operation = snd <$> Map.lookup op availableOperators
 
