@@ -33,7 +33,7 @@ compareOperators op1 op2 = case getPriorities of
 
 useOperator :: String -> Maybe Double -> Maybe Double -> Maybe Double
 useOperator op varX varY | isNothing operation  = Nothing
-                         | otherwise = operation <*> varX <*> varY
+                         | otherwise = operation <*> varY <*> varX
     where
     operation = snd <$> Map.lookup op availableOperators
 
