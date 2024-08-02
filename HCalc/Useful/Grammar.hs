@@ -54,4 +54,4 @@ isBracket :: Char -> Bool
 isBracket c = c `elem` "()"
 
 isAvailableSymbol :: Char -> Bool
-isAvailableSymbol sym = or ([isDigit, isSpace, isBracket, isAvailableCharOperator] <*> pure sym)
+isAvailableSymbol sym = or ([isDigit, isSpace, isBracket, isAvailableCharOperator, (=='.'), isAlpha] <*> pure sym)

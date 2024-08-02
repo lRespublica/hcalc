@@ -21,7 +21,8 @@ lBracket = string "("
 rBracket = string ")"
 comma = string ","
 
-num = some digit
+num :: Parser Char String
+num = (++) <$> some digit <*> ((:) <$> char '.' <*> some digit) <|> some digit
 
 allBrackets = (:) <$> bracket <*> allBrackets <|> anySymb *> allBrackets <|> pure []
 
