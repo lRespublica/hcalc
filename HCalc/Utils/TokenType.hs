@@ -10,6 +10,7 @@ data TokenType where
     L_BRACKET :: TokenType
     R_BRACKET :: TokenType
     COMMA :: TokenType
+    END :: TokenType
 
 getNum :: TokenType -> Maybe HNum
 getNum (NUM a) = Just a
@@ -21,13 +22,8 @@ instance Eq TokenType where
     L_BRACKET == L_BRACKET = True
     R_BRACKET == R_BRACKET = True
     COMMA == COMMA = True
+    END == END = True
 
     _ == _ = False
-
-instance Semigroup TokenType where
-    (<>) x y = COMMA
-
-instance Monoid TokenType where
-    mempty = COMMA
 
 deriving instance Show TokenType
