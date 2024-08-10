@@ -9,7 +9,7 @@ import Control.Monad
 import HCalc.Utils.List
 import HCalc.Utils.HNumbers
 import HCalc.Utils.HFunctions
-import HCalc.Utils.TokenType
+import HCalc.Utils.Token
 
 allOperators :: [Operators]
 allOperators = [minBound .. maxBound]
@@ -23,7 +23,7 @@ availableOperators = Map.fromList operatorStringsList
 compareFunctions :: HFunc f => f -> f -> Ordering
 compareFunctions a b = compare (getPriority a) (getPriority b)
 
-useFunction :: HFunc f => f -> [TokenType] -> Maybe TokenType
+useFunction :: HFunc f => f -> [Token] -> Maybe Token
 useFunction f tokens = do
                        arr <- mapM getNum tokens
                        NUM <$> execFunc f arr

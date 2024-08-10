@@ -13,11 +13,11 @@ getAllTokens str = (:) <$> newToken <*> getAllTokens (fromMaybe [] nextStr)
     newToken = snd <$> parseResult
     nextStr = fst <$> parseResult
 
-toReversePolish :: [(TokenTypes, [Char])] -> [(TokenTypes, [Char])]
+toReversePolish :: [(Tokens, [Char])] -> [(Tokens, [Char])]
 toReversePolish [] = []
 toReversePolish str = helper [] str
     where
-    helper :: [(TokenTypes, [Char])] -> [(TokenTypes, [Char])] -> [(TokenTypes, [Char])]
+    helper :: [(Tokens, [Char])] -> [(Tokens, [Char])] -> [(Tokens, [Char])]
     helper stack [] = stack
     helper stack (curToken:remainingStr) | tokenType == NUM       = curToken : helper stack remainingStr
                                          | tokenType == OPERATOR  = let splittedOperators = splitWhile (hasHigherPriority token . snd) stack
@@ -33,14 +33,14 @@ toReversePolish str = helper [] str
         where
         (tokenType, token) = curToken
 
-reduceReversePolish :: [(TokenTypes, [Char])] -> Maybe Double
+reduceReversePolish :: [(Tokens, [Char])] -> Maybe Double
 reduceReversePolish = helper (Just [])
     where
     executeOperator :: [Char] -> [Double] -> Maybe Double
     executeOperator op operands = foldr1'' (useOperator op) (Just <$> take 2 operands)
 
 
-    helper :: Maybe [Double] -> [(TokenTypes, [Char])] -> Maybe Double
+    helper :: Maybe [Double] -> [(Tokens, [Char])] -> Maybe Double
     helper (Just [x]) [] = Just x
     helper _ [] = Nothing
     helper (Just operands) (x:xs) = case x of

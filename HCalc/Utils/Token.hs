@@ -1,22 +1,22 @@
 {-# LANGUAGE GADTs, StandaloneDeriving #-}
-module HCalc.Utils.TokenType where
+module HCalc.Utils.Token where
 
 import HCalc.Utils.HNumbers
 import HCalc.Utils.HFunctions
 
-data TokenType where
-    NUM :: HNum -> TokenType
-    FUNCTION :: HFunc f => f -> TokenType
-    L_BRACKET :: TokenType
-    R_BRACKET :: TokenType
-    COMMA :: TokenType
-    END :: TokenType
+data Token where
+    NUM :: HNum -> Token
+    FUNCTION :: HFunc f => f -> Token
+    L_BRACKET :: Token
+    R_BRACKET :: Token
+    COMMA :: Token
+    END :: Token
 
-getNum :: TokenType -> Maybe HNum
+getNum :: Token -> Maybe HNum
 getNum (NUM a) = Just a
 getNum _ = Nothing
 
-instance Eq TokenType where
+instance Eq Token where
     (NUM a) == (NUM b) = a == b
     (FUNCTION a) == (FUNCTION b) = show a == show b
     L_BRACKET == L_BRACKET = True
@@ -26,4 +26,4 @@ instance Eq TokenType where
 
     _ == _ = False
 
-deriving instance Show TokenType
+deriving instance Show Token
