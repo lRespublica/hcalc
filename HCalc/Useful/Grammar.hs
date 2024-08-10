@@ -1,57 +1,43 @@
 module HCalc.Useful.Grammar where
+
 import Data.Char
-import qualified Data.Map as Map
 import Data.Maybe
+import qualified Data.Map as Map
+
+import Control.Monad
+
 import HCalc.Utils.List
+import HCalc.Utils.HNumbers
+import HCalc.Utils.HFunctions
+import HCalc.Utils.TokenType
 
-data TokenTypes = NUM | OPERATOR | FUNCTION | L_BRACKET | R_BRACKET | COMMA
-                deriving (Show, Eq)
+allOperators :: [Operators]
+allOperators = [minBound .. maxBound]
 
-instance Semigroup TokenTypes where
-    (<>) x y = NUM
+operatorStringsList = toStringOperatorPair =<< allOperators
+    where toStringOperatorPair op = (, op) <$> getStrs op
 
-instance Monoid TokenTypes where
-    mempty = NUM
+availableOperators :: Map.Map String Operators
+availableOperators = Map.fromList operatorStringsList
 
-usePlus :: Double -> Double -> Double
-usePlus a b = a + b
-useMinus :: Double -> Double -> Double
-useMinus a b = a - b
-useProd :: Double -> Double -> Double
-useProd a b = a * b
-useDiv :: Double -> Double -> Double
-useDiv a b = a / b
+compareFunctions :: HFunc f => f -> f -> Ordering
+compareFunctions a b = compare (getPriority a) (getPriority b)
 
-operatorsList = [("+", (4, usePlus)), ("-", (4, useMinus)), ("*", (5, useProd)), ("/", (5, useDiv))]
-availableOperators = Map.fromList operatorsList
+useFunction :: HFunc f => f -> [TokenType] -> Maybe TokenType
+useFunction f tokens = do
+                       arr <- mapM getNum tokens
+                       NUM <$> execFunc f arr
 
-compareOperators op1 op2 = case getPriorities of
-                                Just [pr1, pr2] -> Just (compare pr1 pr2)
-                                Nothing -> Nothing
+hasHigherPriority :: HFunc f => f -> f -> Bool
+hasHigherPriority fun1 fun2 = comparision /= GT
     where
-    getPriorities = fmap fst <$> sequenceA (Map.lookup <$> [op1, op2] <*> pure availableOperators)
-
-useOperator :: String -> Maybe Double -> Maybe Double -> Maybe Double
-useOperator op varX varY | isNothing operation  = Nothing
-                         | otherwise = operation <*> varY <*> varX
-    where
-    operation = snd <$> Map.lookup op availableOperators
-
-hasHigherPriority op1 op2 = comparision == Just LT || comparision == Just EQ
-    where
-    comparision = compareOperators op1 op2
-
-functionsList = [("abs", 7), ("sqrt", 6)]
-availableFunctions = Map.fromList functionsList
+    comparision = compareFunctions fun1 fun2
 
 isAvailableOperator :: String -> Bool
-isAvailableOperator c = Map.member c availableOperators
-
-isAvailableCharOperator :: Char -> Bool
-isAvailableCharOperator c = Map.member [c] availableOperators
+isAvailableOperator str = Map.member str availableOperators
 
 isBracket :: Char -> Bool
 isBracket c = c `elem` "()"
 
 isAvailableSymbol :: Char -> Bool
-isAvailableSymbol sym = or ([isDigit, isSpace, isBracket, isAvailableCharOperator, (=='.'), isAlpha] <*> pure sym)
+isAvailableSymbol sym = or ([isDigit, isSpace, isBracket, isSymbol, (=='.'), isAlpha] <*> pure sym)
