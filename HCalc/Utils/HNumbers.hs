@@ -1,6 +1,9 @@
 module HCalc.Utils.HNumbers where
 import GHC.Real (Ratio( (:%) ))
 import GHC.Float (Double())
+import Data.List
+import Data.Maybe
+import Text.Read (readMaybe)
 
 data HNum = HInt !Integer | HDouble !Double
 data HFunType = INFIX | POSTFIX deriving (Eq, Show, Ord)
@@ -19,6 +22,13 @@ toNormalForm (HDouble a) | hasFractionalPart = HDouble a
     floored = floor a
     ceiled = ceiling a
     epsilon = 10 ** (-10)
+
+nan = 0/0
+hNan = HDouble nan
+
+readHNum :: String -> HNum
+readHNum str | '.' `elem` str = HDouble $ fromMaybe nan (readMaybe str :: Maybe Double)
+             | otherwise = maybe hNan HInt (readMaybe str :: Maybe Integer)
 
 instance Show HNum where
     show (HInt a) = show a
