@@ -20,7 +20,7 @@ operatorStringsList = toStringOperatorPair =<< allOperators
 availableOperators :: Map.Map String Operators
 availableOperators = Map.fromList operatorStringsList
 
-compareFunctions :: HFunc f => f -> f -> Ordering
+compareFunctions :: (HFunc f, HFunc g) => f -> g -> Ordering
 compareFunctions a b = compare (getPriority a) (getPriority b)
 
 useFunction :: HFunc f => f -> [Token] -> Maybe Token
@@ -28,8 +28,8 @@ useFunction f tokens = do
                        arr <- mapM getNum tokens
                        NUM <$> execFunc f arr
 
-hasHigherPriority :: HFunc f => f -> f -> Bool
-hasHigherPriority fun1 fun2 = comparision /= GT
+hasHigherPriority :: (HFunc f, HFunc g) => f -> g -> Bool
+hasHigherPriority fun1 fun2 = comparision == GT
     where
     comparision = compareFunctions fun1 fun2
 

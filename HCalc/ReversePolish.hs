@@ -2,37 +2,63 @@ module HCalc.ReversePolish where
 
 import HCalc.Useful.Parsers
 import HCalc.Useful.Grammar
+import HCalc.Utils.HFunctions
 import HCalc.Utils.List
+import HCalc.Utils.Token
+
 import Control.Applicative
+import Control.Monad
 import Data.Maybe
 
-getAllTokens [] = Just []
-getAllTokens str = (:) <$> newToken <*> getAllTokens (fromMaybe [] nextStr)
-    where
-    parseResult = sequenceA <$> parseToken str
-    newToken = snd <$> parseResult
-    nextStr = fst <$> parseResult
+type InputToken = Token
+type OutputToken = Token
+type TokenStack = [Token]
+type OutputQuery = [Token]
 
-toReversePolish :: [(Tokens, [Char])] -> [(Tokens, [Char])]
-toReversePolish [] = []
-toReversePolish str = helper [] str
+toReversePolish :: [Token] -> Maybe [Token]
+toReversePolish [] = Just []
+toReversePolish list = helper list []
     where
-    helper :: [(Tokens, [Char])] -> [(Tokens, [Char])] -> [(Tokens, [Char])]
-    helper stack [] = stack
-    helper stack (curToken:remainingStr) | tokenType == NUM       = curToken : helper stack remainingStr
-                                         | tokenType == OPERATOR  = let splittedOperators = splitWhile (hasHigherPriority token . snd) stack
-                                                                        pulled = fst splittedOperators
-                                                                        remainingStack = snd splittedOperators
-                                                                        in pulled ++ helper (curToken : remainingStack) remainingStr
-                                         | tokenType == L_BRACKET = helper (curToken:stack) remainingStr
-                                         | tokenType == R_BRACKET = let splitted = splitWhile (\x -> fst x /= L_BRACKET) stack
-                                                                        pulled = fst splitted
-                                                                        remainingStack = drop 1 . snd $ splitted
-                                                                        in pulled ++ helper remainingStack remainingStr
+    helper :: [InputToken] -> TokenStack -> Maybe OutputQuery
+    helper (x:xs) stack = do
+                          (newStack, curOutput) <- sorter x stack
+                          if x == END
+                            then return curOutput
+                            else do
+                                 nextOutput <- helper xs newStack
+                                 return (curOutput ++ nextOutput)
 
+    -- Function responsible for processing one token according to the shunting yard algorithm
+    sorter :: InputToken -> TokenStack -> Maybe (TokenStack, OutputQuery)
+    sorter a@(NUM _) stack = return (stack, [a])
+
+    sorter fToken@(FUNCTION f) stack | fType == PREFIX = return (fToken : stack, [])
+                                     | otherwise = return $ splitByPriority stack
         where
-        (tokenType, token) = curToken
+        fType = getType f
 
+        splitByPriority :: TokenStack -> (TokenStack, OutputQuery)
+        splitByPriority gs'@(FUNCTION g : gs) | getType g /= INFIX = (fToken:gs', [])
+                                              | hasHigherPriority f g = (fToken:gs', [])
+                                              | otherwise = (FUNCTION g:) <$> splitByPriority gs
+        splitByPriority stack = (fToken:stack, [])
+
+    sorter COMMA [] = Nothing
+    sorter COMMA stack@(L_BRACKET : xs) = Just (stack, [])
+    sorter COMMA (x:xs) = fmap (x:) <$> sorter COMMA xs
+
+    sorter L_BRACKET stack = return (L_BRACKET : stack, [])
+
+    sorter R_BRACKET [] = Nothing
+    sorter R_BRACKET (L_BRACKET : FUNCTION f : stack) | getType f == PREFIX = return (stack, [FUNCTION f])
+                                                      | otherwise = return (FUNCTION f : stack, [])
+    sorter R_BRACKET (L_BRACKET : stack) = return (stack, [])
+    sorter R_BRACKET (x:xs) = fmap (x:) <$> sorter R_BRACKET xs
+
+    sorter END stack | L_BRACKET `elem` stack = Nothing
+                     | otherwise = return ([], stack)
+
+{-
 reduceReversePolish :: [(Tokens, [Char])] -> Maybe Double
 reduceReversePolish = helper (Just [])
     where
@@ -49,3 +75,4 @@ reduceReversePolish = helper (Just [])
                                                         then helper ((:) <$> executeOperator val operands <*> Just(drop 2 operands)) xs
                                                         else helper Nothing xs
     helper Nothing _ = Nothing
+  -}
