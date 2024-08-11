@@ -6,7 +6,6 @@ import Data.Maybe
 import Text.Read (readMaybe)
 
 data HNum = HInt !Integer | HDouble !Double
-data HFunType = INFIX | POSTFIX deriving (Eq, Show, Ord)
 
 toNormalForm :: HNum -> HNum
 toNormalForm (HInt a) = HInt a

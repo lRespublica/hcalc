@@ -2,6 +2,8 @@ module HCalc.Utils.HFunctions where
 
 import HCalc.Utils.HNumbers
 
+data HFunType = INFIX | PREFIX deriving (Eq, Show, Ord)
+
 class (Eq a, Show a) => HFunc a where
     getStrs :: a -> [String]
     getPriority :: a -> Int
