@@ -26,7 +26,7 @@ nan = 0/0
 hNan = HDouble nan
 
 readHNum :: String -> HNum
-readHNum str | '.' `elem` str = HDouble $ fromMaybe nan (readMaybe str :: Maybe Double)
+readHNum str | '.' `elem` str = maybe hNan HDouble (readMaybe str :: Maybe Double)
              | otherwise = maybe hNan HInt (readMaybe str :: Maybe Integer)
 
 instance Show HNum where
