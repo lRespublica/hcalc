@@ -9,17 +9,20 @@ import HCalc.Utils.Token
 import Control.Applicative
 import Control.Monad
 import Data.Maybe
+import Data.Either
 
 type InputToken = Token
 type OutputToken = Token
 type TokenStack = [Token]
 type OutputQuery = [Token]
 
-toReversePolish :: [Token] -> Maybe [Token]
-toReversePolish [] = Just []
+type ErrorString = String
+
+toReversePolish :: [Token] -> Either ErrorString [Token]
+toReversePolish [] = Right []
 toReversePolish list = helper list []
     where
-    helper :: [InputToken] -> TokenStack -> Maybe OutputQuery
+    helper :: [InputToken] -> TokenStack -> Either ErrorString OutputQuery
     helper (x:xs) stack = do
                           (newStack, curOutput) <- sorter x stack
                           if x == END
@@ -29,7 +32,7 @@ toReversePolish list = helper list []
                                  return (curOutput ++ nextOutput)
 
     -- Function responsible for processing one token according to the shunting yard algorithm
-    sorter :: InputToken -> TokenStack -> Maybe (TokenStack, OutputQuery)
+    sorter :: InputToken -> TokenStack -> Either ErrorString (TokenStack, OutputQuery)
     sorter a@(NUM _) stack = return (stack, [a])
 
     sorter fToken@(FUNCTION f) stack | fType == PREFIX = return (fToken : stack, [])
@@ -43,19 +46,19 @@ toReversePolish list = helper list []
                                               | otherwise = (FUNCTION g:) <$> splitByPriority gs
         splitByPriority stack = (fToken:stack, [])
 
-    sorter COMMA [] = Nothing
-    sorter COMMA stack@(L_BRACKET : xs) = Just (stack, [])
+    sorter COMMA [] = Left "The expression is missing an opening parenthesis."
+    sorter COMMA stack@(L_BRACKET : xs) = Right (stack, [])
     sorter COMMA (x:xs) = fmap (x:) <$> sorter COMMA xs
 
     sorter L_BRACKET stack = return (L_BRACKET : stack, [])
 
-    sorter R_BRACKET [] = Nothing
+    sorter R_BRACKET [] = Left "The expression is missing an opening parenthesis."
     sorter R_BRACKET (L_BRACKET : FUNCTION f : stack) | getType f == PREFIX = return (stack, [FUNCTION f])
                                                       | otherwise = return (FUNCTION f : stack, [])
     sorter R_BRACKET (L_BRACKET : stack) = return (stack, [])
     sorter R_BRACKET (x:xs) = fmap (x:) <$> sorter R_BRACKET xs
 
-    sorter END stack | L_BRACKET `elem` stack = Nothing
+    sorter END stack | L_BRACKET `elem` stack = Left "The expression is missing an closing parenthesis."
                      | otherwise = return ([], stack)
 
 {-

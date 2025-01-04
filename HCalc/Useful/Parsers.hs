@@ -68,10 +68,10 @@ runTokenParser (token, parser) str = do
 allParsableTokens = join [grammarTokens, numberTokens, operatorsTokens]
 
 -- Running all parsers with folding
-parseToken :: String -> Maybe (Token, StringAfterParsing)
-parseToken str = foldr (\x y -> y <|> runTokenParser x str) Nothing allParsableTokens
+parseToken :: String -> Either String (Token, StringAfterParsing)
+parseToken str = maybe (Left "") Right $ foldr (\x y -> y <|> runTokenParser x str) Nothing allParsableTokens
 
-parseStringForTokens :: String -> Maybe [Token]
+parseStringForTokens :: String -> Either String [Token]
 parseStringForTokens str = do
                             (newToken, nextStr) <- parseToken str
                             case newToken of
