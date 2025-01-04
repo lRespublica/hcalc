@@ -1,0 +1,26 @@
+cabal-version:      3.0
+name:               hcalc
+version:            0.1.0
+
+synopsis: A CLI calculator made on haskell
+
+license:            GPL-3.0-or-later
+license-file:       LICENSE
+
+author:             Leonid Znamenok
+maintainer:         respublica@altlinux.org
+
+category:           Math
+build-type:         Simple
+
+
+common warnings
+    ghc-options: -Wall
+
+executable hcalc
+    main-is:          Main.hs
+
+    other-extensions: GADTs, StandaloneDeriving
+    build-depends:    base ^>=4.17.2.1
+    hs-source-dirs:   src
+    default-language: GHC2021
