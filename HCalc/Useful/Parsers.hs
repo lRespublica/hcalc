@@ -69,7 +69,7 @@ allParsableTokens = join [grammarTokens, numberTokens, operatorsTokens]
 
 -- Running all parsers with folding
 parseToken :: String -> Either String (Token, StringAfterParsing)
-parseToken str = maybe (Left "") Right $ foldr (\x y -> y <|> runTokenParser x str) Nothing allParsableTokens
+parseToken str@(s:_) = maybe (Left ("Unknown symbol " ++ [s])) Right $ foldr (\x y -> y <|> runTokenParser x str) Nothing allParsableTokens
 
 parseStringForTokens :: String -> Either String [Token]
 parseStringForTokens str = do
