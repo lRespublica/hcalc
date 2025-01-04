@@ -5,6 +5,7 @@ import HCalc.Useful.Grammar
 import HCalc.Utils.HFunctions
 import HCalc.Utils.List
 import HCalc.Utils.Token
+import HCalc.Utils.HNumbers
 
 import Control.Applicative
 import Control.Monad
@@ -18,9 +19,12 @@ type OutputQuery = [Token]
 
 type ErrorString = String
 
+type ResultNumber = HNum
+type NumbersStack = [HNum]
+
 toReversePolish :: [Token] -> Either ErrorString [Token]
 toReversePolish [] = Right []
-toReversePolish list = helper list []
+toReversePolish list = (++[END]) <$> helper list []
     where
     helper :: [InputToken] -> TokenStack -> Either ErrorString OutputQuery
     helper (x:xs) stack = do
@@ -61,21 +65,18 @@ toReversePolish list = helper list []
     sorter END stack | L_BRACKET `elem` stack = Left "The expression is missing an closing parenthesis."
                      | otherwise = return ([], stack)
 
-{-
-reduceReversePolish :: [(Tokens, [Char])] -> Maybe Double
-reduceReversePolish = helper (Just [])
+reduceReversePolish :: [Token] -> Either String ResultNumber
+reduceReversePolish [] = Left "Empty input"
+reduceReversePolish list = helper list []
     where
-    executeOperator :: [Char] -> [Double] -> Maybe Double
-    executeOperator op operands = foldr1'' (useOperator op) (Just <$> take 2 operands)
+    helper :: [InputToken] -> NumbersStack -> Either ErrorString ResultNumber
+    helper (END:_) [val] = Right val
+    helper (END:_) _ = Left "Not enough operations"
+    helper (x:xs) stack = do
+                            newStack <- reducer x stack
+                            helper xs newStack
 
-
-    helper :: Maybe [Double] -> [(Tokens, [Char])] -> Maybe Double
-    helper (Just [x]) [] = Just x
-    helper _ [] = Nothing
-    helper (Just operands) (x:xs) = case x of
-                                (NUM, val) -> helper (Just (readDouble val : operands)) xs
-                                (OPERATOR, val) -> if length' operands >=2
-                                                        then helper ((:) <$> executeOperator val operands <*> Just(drop 2 operands)) xs
-                                                        else helper Nothing xs
-    helper Nothing _ = Nothing
-  -}
+    reducer :: InputToken -> NumbersStack -> Either ErrorString NumbersStack
+    reducer (NUM val) xs = Right (val:xs)
+    reducer (FUNCTION f) xs = execFunc f xs
+    reducer _ _ = Left "Unknown token"
